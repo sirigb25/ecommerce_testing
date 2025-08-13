@@ -13,7 +13,7 @@ Features Tested:
   How to Run Tests:
 1. Clone the repository
    
-  git clone https://github.com/your-username/ecommerce_testing.git
+  git clone https://github.com/sirigb25/ecommerce_testing.git
    
 2.Navigate to the project folder
 
