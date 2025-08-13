@@ -1,59 +1,63 @@
-# test_checkout.py
-
-import pytest
+from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-def test_checkout(driver):
-    driver.get("https://www.saucedemo.com")
-
+def test_checkout():
+    # --- Setup ---
+    driver = webdriver.Chrome()
+    driver.maximize_window()
     wait = WebDriverWait(driver, 15)
 
-    # --- LOGIN ---
-    username = wait.until(EC.presence_of_element_located((By.ID, "user-name")))
-    password = driver.find_element(By.ID, "password")
-    login_button = driver.find_element(By.ID, "login-button")
+    try:
+        # --- Open site ---
+        driver.get("https://www.saucedemo.com")
 
-    username.send_keys("standard_user")
-    password.send_keys("secret_sauce")
-    login_button.click()
+        # --- Login ---
+        username = wait.until(EC.presence_of_element_located((By.ID, "user-name")))
+        password = driver.find_element(By.ID, "password")
+        login_button = driver.find_element(By.ID, "login-button")
 
-    # --- ADD TO CART ---
-    add_to_cart_btn = wait.until(
-        EC.element_to_be_clickable((By.ID, "add-to-cart-sauce-labs-backpack"))
-    )
-    add_to_cart_btn.click()
+        username.send_keys("standard_user")
+        password.send_keys("secret_sauce")
+        login_button.click()
 
-    # --- GO TO CART ---
-    cart_icon = wait.until(
-        EC.element_to_be_clickable((By.CLASS_NAME, "shopping_cart_link"))
-    )
-    cart_icon.click()
+        # --- Add item to cart ---
+        add_to_cart_btn = wait.until(
+            EC.element_to_be_clickable((By.ID, "add-to-cart-sauce-labs-backpack"))
+        )
+        add_to_cart_btn.click()
 
-    # --- CHECKOUT ---
-    checkout_btn = wait.until(
-        EC.element_to_be_clickable((By.ID, "checkout"))
-    )
-    checkout_btn.click()
+        # --- Go to cart ---
+        cart_icon = wait.until(EC.element_to_be_clickable((By.CLASS_NAME, "shopping_cart_link")))
+        cart_icon.click()
 
-    # --- FILL CHECKOUT INFO ---
-    first_name = wait.until(EC.presence_of_element_located((By.ID, "first-name")))
-    last_name = driver.find_element(By.ID, "last-name")
-    postal_code = driver.find_element(By.ID, "postal-code")
-    continue_btn = driver.find_element(By.ID, "continue")
+        # --- Checkout ---
+        checkout_btn = wait.until(EC.element_to_be_clickable((By.ID, "checkout")))
+        checkout_btn.click()
 
-    first_name.send_keys("John")
-    last_name.send_keys("Doe")
-    postal_code.send_keys("12345")
-    continue_btn.click()
+        # --- Enter user info ---
+        first_name = wait.until(EC.presence_of_element_located((By.ID, "first-name")))
+        last_name = driver.find_element(By.ID, "last-name")
+        postal_code = driver.find_element(By.ID, "postal-code")
 
-    # --- FINISH ORDER ---
-    finish_btn = wait.until(EC.element_to_be_clickable((By.ID, "finish")))
-    finish_btn.click()
+        first_name.send_keys("John")
+        last_name.send_keys("Doe")
+        postal_code.send_keys("12345")
 
-    # --- VERIFY ORDER COMPLETE ---
-    complete_header = wait.until(
-        EC.visibility_of_element_located((By.CLASS_NAME, "complete-header"))
-    )
-    assert "Thank you for your order!" in complete_header.text
+        continue_btn = driver.find_element(By.ID, "continue")
+        continue_btn.click()
+
+        # --- Finish checkout ---
+        finish_btn = wait.until(EC.element_to_be_clickable((By.ID, "finish")))
+        finish_btn.click()
+
+        # --- Verify confirmation ---
+        complete_header = wait.until(
+            EC.visibility_of_element_located((By.CLASS_NAME, "complete-header"))
+        )
+        assert complete_header.text.strip().lower() == "thank you for your order!"
+        print("Checkout completed successfully!")
+
+    finally:
+        driver.quit()
