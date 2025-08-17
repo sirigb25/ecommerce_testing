@@ -35,3 +35,11 @@ Features Tested:
 6.Run tests using Pytest
 
   pytest -v
+
+7.Clean and re-generate the report
+
+allure generate allure-results -o allure-report --clean
+
+8.Open the report
+
+allure open allure-report
